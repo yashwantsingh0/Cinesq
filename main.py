@@ -5,16 +5,14 @@
 #  License: MIT
 # ──────────────────────────────────────────────────────────────
 
+# main.py
 import sys
 from PyQt5.QtWidgets import QApplication
-from player.video_player import CinesqPlayer  # FIXED import
+from player.video_player import CinesqPlayer
 
-def main():
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = CinesqPlayer()
-    window.show()
+    player = CinesqPlayer()
+    player.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
 
