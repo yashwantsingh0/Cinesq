@@ -12,25 +12,25 @@ class PlayerControls(QWidget):
         super().__init__(parent)
         self.setFixedHeight(80)
 
-        # ─── Top Row: Time + Seekbar ─────────────
+        # ─── Time Labels + Seek Slider ─────────────
         self.time_left = QLabel("00:00")
         self.time_right = QLabel("00:00")
 
         self.seek_slider = QSlider(Qt.Horizontal)
         self.seek_slider.setRange(0, 1000)
         self.seek_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.seek_slider.setToolTip("Seek")
+        self.seek_slider.setToolTip("Seek through video")
 
         seek_layout = QHBoxLayout()
         seek_layout.addWidget(self.time_left)
         seek_layout.addWidget(self.seek_slider)
         seek_layout.addWidget(self.time_right)
 
-        # ─── Bottom Row: Playback Controls ───────
+        # ─── Playback Buttons ─────────────
         self.rewind_button = QPushButton()
         self.rewind_button.setIcon(QIcon("assets/icons/rewind.svg"))
         self.rewind_button.setIconSize(QSize(20, 20))
-        self.rewind_button.setToolTip("Rewind")
+        self.rewind_button.setToolTip("Rewind 10 seconds")
 
         self.play_button = QPushButton()
         self.play_button.setIcon(QIcon("assets/icons/play.svg"))
@@ -40,13 +40,14 @@ class PlayerControls(QWidget):
         self.stop_button = QPushButton()
         self.stop_button.setIcon(QIcon("assets/icons/stop.svg"))
         self.stop_button.setIconSize(QSize(20, 20))
-        self.stop_button.setToolTip("Stop")
+        self.stop_button.setToolTip("Stop playback")
 
         self.forward_button = QPushButton()
         self.forward_button.setIcon(QIcon("assets/icons/forward.svg"))
         self.forward_button.setIconSize(QSize(20, 20))
-        self.forward_button.setToolTip("Forward")
+        self.forward_button.setToolTip("Forward 10 seconds")
 
+        # ─── Volume Controls ─────────────
         self.volume_icon = QPushButton()
         self.volume_icon.setIcon(QIcon("assets/icons/volume.svg"))
         self.volume_icon.setIconSize(QSize(20, 20))
@@ -57,13 +58,15 @@ class PlayerControls(QWidget):
         self.volume_slider.setRange(0, 100)
         self.volume_slider.setValue(50)
         self.volume_slider.setFixedWidth(100)
-        self.volume_slider.setToolTip("Volume")
+        self.volume_slider.setToolTip("Adjust volume")
 
+        # ─── Fullscreen ─────────────
         self.fullscreen_button = QPushButton()
         self.fullscreen_button.setIcon(QIcon("assets/icons/fullscreen.svg"))
         self.fullscreen_button.setIconSize(QSize(20, 20))
-        self.fullscreen_button.setToolTip("Toggle Fullscreen")
+        self.fullscreen_button.setToolTip("Toggle fullscreen mode")
 
+        # ─── Layout ─────────────
         control_layout = QHBoxLayout()
         control_layout.setSpacing(10)
         control_layout.setContentsMargins(10, 0, 10, 0)
@@ -77,7 +80,6 @@ class PlayerControls(QWidget):
         control_layout.addWidget(self.volume_slider)
         control_layout.addWidget(self.fullscreen_button)
 
-        # ─── Combine ─────────────────────────────
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 5, 10, 5)
         layout.addLayout(seek_layout)
@@ -86,5 +88,5 @@ class PlayerControls(QWidget):
         self.setLayout(layout)
 
     def set_playing(self, playing: bool):
-        icon = "pause.svg" if playing else "play.svg"
-        self.play_button.setIcon(QIcon(f"assets/icons/{icon}"))
+        icon_name = "pause.svg" if playing else "play.svg"
+        self.play_button.setIcon(QIcon(f"assets/icons/{icon_name}"))
