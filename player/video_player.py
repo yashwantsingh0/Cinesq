@@ -1,8 +1,10 @@
 import os
 import sys
+import subprocess
+
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QFileDialog, QShortcut, QListWidget, QApplication,
-    QMainWindow, QAction, QMenu, QMenuBar
+    QWidget, QVBoxLayout, QShortcut, QListWidget, QApplication,
+    QMainWindow, QAction, QMenu, QMenuBar, QMessageBox
 )
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QKeySequence
@@ -71,18 +73,32 @@ class CinesqPlayer(QMainWindow):
         menu_bar = create_menu_bar(self)
         self.setMenuBar(menu_bar)
 
-        # Add Playlist toggle to File menu
+        # Playlist toggle
         file_menu = menu_bar.actions()[0].menu()
         toggle_playlist_action = QAction("Show Playlist", self, checkable=True)
         toggle_playlist_action.triggered.connect(self.toggle_playlist)
         file_menu.addAction(toggle_playlist_action)
 
-        # Add theme toggle
+        # Theme toggle
         view_menu = next((a.menu() for a in menu_bar.actions() if a.text() == "View"), None)
         if view_menu:
             toggle_theme = QAction("Toggle Light/Dark", self)
             toggle_theme.triggered.connect(self.toggle_theme)
             view_menu.addAction(toggle_theme)
+
+    # ────── GNOME-native File Dialog (zenity) ──────
+    def system_file_dialog(self, title="Select File", file_filter="*.*"):
+        try:
+            cmd = [
+                "zenity", "--file-selection",
+                "--title", title,
+                "--file-filter", f"{file_filter} | {file_filter}"
+            ]
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+            return result.stdout.strip() if result.returncode == 0 else None
+        except Exception as e:
+            print(f"[FileDialog] Error: {e}")
+            return None
 
     # ────── Theme/QSS ──────────
     def load_dark_qss(self):
@@ -94,10 +110,7 @@ class CinesqPlayer(QMainWindow):
 
     def toggle_theme(self):
         self.is_dark_theme = not self.is_dark_theme
-        if self.is_dark_theme:
-            self.load_dark_qss()
-        else:
-            self.setStyleSheet("")  # fallback to light
+        self.setStyleSheet(self.load_dark_qss() if self.is_dark_theme else "")
 
     # ────── Playback ───────────
     def toggle_play(self):
@@ -137,7 +150,7 @@ class CinesqPlayer(QMainWindow):
     # ────── Playlist ───────────
     def open_file(self, path=None):
         if not path:
-            file, _ = QFileDialog.getOpenFileName(self, "Open Video")
+            file = self.system_file_dialog("Open Media", "*.mp4 *.mkv *.avi *.webm")
         else:
             file = path
         if file:
@@ -148,6 +161,8 @@ class CinesqPlayer(QMainWindow):
             if file not in self.recent_files:
                 self.recent_files.append(file)
                 self.playlist.addItem(os.path.basename(file))
+                if hasattr(self, "recent_files_changed"):
+                    self.recent_files_changed()
 
     def play_selected_video(self, item):
         idx = self.playlist.row(item)
@@ -195,6 +210,30 @@ class CinesqPlayer(QMainWindow):
     def dropEvent(self, event):
         for url in event.mimeData().urls():
             self.open_file(url.toLocalFile())
+
+    # ────── Subtitles ────────
+    def load_subtitle(self):
+        file = self.system_file_dialog("Load Subtitle", "*.srt *.ass *.vtt")
+        if file:
+            try:
+                self.media_player.setSubtitle(QUrl.fromLocalFile(file))  # backend-dependent
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Failed to load subtitle:\n{e}")
+
+    def adjust_sub_font(self, delta):
+        print(f"[Subtitles] Font size adjust: {delta}pt")  # Placeholder
+
+    def adjust_sub_delay(self, ms):
+        try:
+            self.media_player.setSubtitleDelay(self.media_player.subtitleDelay() + ms)
+        except Exception as e:
+            QMessageBox.warning(self, "Subtitle Delay", f"Failed to adjust delay:\n{e}")
+
+    def disable_subtitle(self):
+        try:
+            self.media_player.setSubtitle(None)
+        except Exception:
+            print("Disabling subtitles not supported in current backend.")
 
 
 if __name__ == "__main__":
