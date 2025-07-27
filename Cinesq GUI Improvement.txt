@@ -1,0 +1,90 @@
+✅ Cinesq GUI Improvement Checklist
+🎨 A. Visual & Theming
+
+Replace QPalette-based theming with .qss stylesheets.
+
+Create dark and light .qss files that fully skin the app (buttons, sliders, etc.).
+
+Match VLC's flat dark theme (like vlc_dark.qss).
+
+    Add dynamic theme switching via menu (View > Theme > [Light/Dark]).
+
+🎛 B. Control Bar Redesign
+
+Use monochrome SVG icons for all control buttons:
+
+    Play / Pause
+
+    Stop
+
+    Rewind / Forward
+
+    Volume
+
+Combine seek slider + media controls + volume into a single row.
+
+Ensure proper sizing and spacing for a tight, modern layout.
+
+Add tooltips for all buttons ("Play", "Mute", etc.).
+
+    Use QSizePolicy.Expanding for the seekbar to grow with window.
+
+🗂 C. Playlist Improvements
+
+Hide playlist by default (like VLC).
+
+Add toggle under View > Show Playlist.
+
+Add right-click context menu:
+
+Remove item
+
+    Reveal in file manager
+
+    Optional: Enable drag-and-drop reordering.
+
+🧩 D. Menus & Actions
+
+Add a proper Tools > Settings placeholder.
+
+Add View > Theme > [Light / Dark / Custom...].
+
+Integrate a plugin toggle menu (optional future work).
+
+    Move author info to Help > About.
+
+💡 E. User Experience
+
+Show media title in window titlebar when playing.
+
+Show hover tooltip on seekbar (e.g. "01:23") – advanced, later.
+
+    Animate or highlight current playback in playlist.
+
+⚙️ F. Refactor & Polish
+
+Integrate PlayerControls from controls.py into video_player.py (currently unused).
+
+Use a ThemeManager or StyleLoader class to handle .qss files.
+
+Add JSON-based settings persistence (config.json):
+
+    Volume level
+
+    Theme
+
+    Last opened files
+
+    Use constants (e.g. SEEK_STEP = 10000) instead of magic numbers.
+
+🧭 OPTIONAL: Advanced / Future Ideas
+
+Mini-mode UI toggle (like compact player).
+
+Fullscreen toggle button/icon.
+
+Screenshot feature (current frame).
+
+Picture-in-picture mode.
+
+Visualizer for audio tracks.
